@@ -35,7 +35,7 @@ export const projectService= {
     return res.json();
   },
   getVariablesById: async ( id: number ): Promise<Variable[]>=> {
-    const res= await apiFetch( `/project/${ id }/variables` );
+    const res= await apiFetch( `/project/${ id }/variable` );
     return res.json();
   }
 };
