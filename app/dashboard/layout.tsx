@@ -21,7 +21,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <AppSidebar variant="inset" user={ user } />
         <SidebarInset>
           <SiteHeader />
-          <main className="h-full flex p-4">
+          <main className="h-full p-4">
             { children }
           </main>
         </SidebarInset>
