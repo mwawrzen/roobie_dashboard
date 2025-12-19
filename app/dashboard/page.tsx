@@ -1,13 +1,7 @@
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
-import { DataTable } from "@/components/data-table";
 import { SectionCards } from "@/components/section-cards";
-import { projectService } from "@/services/project.service";
-
-import data from "./data.json";
 
 export default async function DashboardPage() {
-  const projects= await projectService.getAll();
-
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-2">
@@ -16,7 +10,6 @@ export default async function DashboardPage() {
           <div className="px-4 lg:px-6">
             <ChartAreaInteractive />
           </div>
-          <DataTable data={ data } />
         </div>
       </div>
     </div>
