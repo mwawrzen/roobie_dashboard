@@ -1,13 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { useEffect } from "react";
 
 export default function Error({
-  error,
-  reset
+  error
 }: {
-  error: Error& { digest?: string },
-  reset: ()=> void
+  error: Error& { digest?: string }
 }) {
 
   useEffect(() => {
@@ -15,17 +14,14 @@ export default function Error({
   }, [ error ]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-100 border-2 border-dashed border-red-200 rounded-xl p-8 bg-red-50">
-      <h2 className="text-xl font-bold text-red-800 mb-4">
-        Oops! Listing projects gone wrong...
+    <main className="grow flex flex-col items-center justify-center gap-4">
+      <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+        Oops! Something went wrong...
       </h2>
       <p className="text-red-600 mb-6">{ error.message }</p>
-      <Button
-        onClick={ ()=> reset() }
-        className="bg-red-600 hover:bg-red-700 cursor-pointer"
-      >
-        Try again
-      </Button>
-    </div>
+      <Link href="/dashboard">
+        <Button variant="outline">Return to Dashboard</Button>
+      </Link>
+    </main>
   );
 };

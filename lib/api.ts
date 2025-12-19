@@ -2,6 +2,12 @@ import { cookies } from "next/headers";
 
 const API_URL= "http://localhost:3001/api/v1";
 
+const messages: Record<string, string>= {
+  "401": "You have to be logged in",
+  "403": "You don't have access to this resource",
+  "404": "Resource not found"
+};
+
 export async function apiFetch( endpoint: string, options: RequestInit= {}) {
   const cookieStore= await cookies();
   const token= cookieStore.get( "auth" )?.value;
@@ -17,8 +23,12 @@ export async function apiFetch( endpoint: string, options: RequestInit= {}) {
     headers
   });
 
-  if( !response.ok )
-    throw new Error( `Server error: ${ response.status }` );
+  if( !response.ok ) {
+    throw new Error(
+      messages[ String( response.status )]||
+      `Server error: ${ response.status }`
+    );
+  }
 
   return response;
 };

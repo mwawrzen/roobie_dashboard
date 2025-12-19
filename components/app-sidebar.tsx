@@ -26,13 +26,9 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { ModeToggle } from "./mode-toggle";
+import { User } from "@/services/user.service";
 
 const data= {
-  user: {
-    name: "admin",
-    email: "admin@example.com",
-    avatar: "#",
-  },
   navMain: [
     {
       title: "Dashboard",
@@ -48,6 +44,7 @@ const data= {
       title: "Users",
       url: "/dashboard/users",
       icon: IconUsers,
+      admin: true
     },
   ],
   navClouds: [
@@ -103,17 +100,7 @@ const data= {
       title: "Settings",
       url: "#",
       icon: IconSettings,
-    },
-    // {
-    //   title: "Get Help",
-    //   url: "#",
-    //   icon: IconHelp,
-    // },
-    // {
-    //   title: "Search",
-    //   url: "#",
-    //   icon: IconSearch,
-    // },
+    }
   ]
 };
 
@@ -122,8 +109,15 @@ export function AppSidebar({
   ...props
 }:
   React.ComponentProps<typeof Sidebar>&
-  { user: any }
+  { user: User }
 ) {
+
+  const filteredNavMain= data.navMain.filter( nav=> {
+    if( nav.admin&& user.role!== "ADMIN" )
+      return false;
+    return true;
+  });
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -145,7 +139,7 @@ export function AppSidebar({
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={ data.navMain } />
+        <NavMain items={ filteredNavMain } />
         <NavSecondary items={ data.navSecondary } className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
