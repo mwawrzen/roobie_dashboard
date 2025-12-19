@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/table";
 import { Project } from "@/services/project.service";
 import { IconArchive, IconCalendarTime, IconCircleCheckFilled } from "@tabler/icons-react";
+import Link from "next/link";
 
 export const columns: ColumnDef<Project>[] = [
   {
@@ -81,7 +82,9 @@ export const columns: ColumnDef<Project>[] = [
     enableHiding: false,
     cell: ({ row })=> {
       return (
-        <Button variant="outline" size="sm">Manage</Button>
+        <Button variant="outline" size="sm" asChild>
+          <Link href={ `/dashboard/projects/${ row.original.id }` }>Manage</Link>
+        </Button>
       );
     }
   },
