@@ -16,7 +16,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <AppSidebar variant="inset" />
         <SidebarInset>
           <SiteHeader />
-          <main className="p-4">
+          <main className="h-full flex p-4">
             { children }
           </main>
         </SidebarInset>
