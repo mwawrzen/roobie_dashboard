@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { ModeToggle } from "./mode-toggle";
+import { User } from "@/services/user.service";
 
 const data= {
   navMain: [
@@ -108,7 +109,7 @@ export function AppSidebar({
   ...props
 }:
   React.ComponentProps<typeof Sidebar>&
-  { user: any }
+  { user: User }
 ) {
 
   const filteredNavMain= data.navMain.filter( nav=> {

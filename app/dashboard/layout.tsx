@@ -2,10 +2,11 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { authService } from "@/services/auth.service";
+import { User } from "@/services/user.service";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
 
-  const user= await authService.getMe();
+  const user: User= await authService.getMe();
 
   return (
     <div className="flex min-h-screen bg-gray-50">
