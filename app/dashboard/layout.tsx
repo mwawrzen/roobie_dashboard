@@ -5,7 +5,7 @@ import { authService } from "@/services/auth.service";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
 
-  const user: { id: number, email: string, role: string, createdAt: string }= await authService.getMe();
+  const user= await authService.getMe();
 
   return (
     <div className="flex min-h-screen bg-gray-50">
