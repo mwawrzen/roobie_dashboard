@@ -12,7 +12,7 @@ export default async function Page({
 }) {
   const { id }= await params;
   const project= await projectService.getById( +id );
-  const variables= projectService.getVariablesById( +id );
+  const variables= await projectService.getVariablesById( +id );
 
   return (
     <main>
@@ -39,7 +39,7 @@ export default async function Page({
           <TabsTrigger value="users">Users</TabsTrigger>
         </TabsList>
         <TabsContent value="variables">
-          {/* <VariablesDataTable /> */}
+          <VariablesDataTable data={ variables } />
         </TabsContent>
       </Tabs>
       {/* <h2>Project</h2>
