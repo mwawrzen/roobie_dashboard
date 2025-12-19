@@ -1,24 +1,7 @@
-import { cookies } from "next/headers";
-
-async function getProjects() {
-  const cookieStore= await cookies();
-  const token= cookieStore.get( "auth" )?.value;
-
-  const res= await fetch( "http://localhost:3001/api/v1/projects", {
-    headers: {
-      "Cookie": `auth=${ token }`
-    },
-    next: { revalidate: 0 }
-  });
-
-  if( !res.ok )
-    return [];
-
-  return res.json();
-}
+import { projectService } from "@/services/project.service";
 
 export default async function DashboardPage() {
-  const projects= await getProjects();
+  const projects= await projectService.getAll();
 
   return (
     <div>
