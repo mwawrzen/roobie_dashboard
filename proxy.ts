@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
-export function middleware( request: NextRequest ) {
+export function proxy( request: NextRequest ) {
   const token= request.cookies.get( "auth" );
+
+  console.log( "Token", token );
 
   if( !token&& request.nextUrl.pathname.startsWith( "/dashboard" ))
     return NextResponse.redirect( new URL( "/login", request.url ));
