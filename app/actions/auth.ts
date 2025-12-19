@@ -28,3 +28,11 @@ export async function loginAction( state: any, formData: FormData ) {
 
   redirect( "/dashboard" );
 };
+
+export async function logoutAction() {
+
+  const cookieStore= await cookies();
+  cookieStore.delete( "auth" );
+
+  redirect( "/login" );
+};
