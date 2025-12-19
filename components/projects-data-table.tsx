@@ -95,7 +95,7 @@ export const columns: ColumnDef<Project>[] = [
 ]
 
 export function ProjectsDataTable({ data }: { data: Project[] }) {
-  console.log( data );
+
   const table = useReactTable({
     data,
     columns,
