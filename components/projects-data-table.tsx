@@ -11,6 +11,7 @@ import {
 } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -29,6 +30,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Project } from "@/services/project.service";
+import { IconArchive, IconCalendarTime, IconCircleCheckFilled } from "@tabler/icons-react";
 
 export const columns: ColumnDef<Project>[] = [
   {
@@ -51,7 +53,20 @@ export const columns: ColumnDef<Project>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
-      <div className="capitalize">{ row.getValue( "status" )}</div>
+      <Badge variant="outline">
+        {
+          row.original.status=== "PLANNED"?
+            <><IconCalendarTime /> Planned</>:
+              row.original.status=== "ARCHIVED"?
+                <><IconArchive /> Archived</>:
+                <>
+                  <IconCircleCheckFilled
+                    className="fill-green-500 dark:fill-green-400"
+                  />
+                  Active
+                </>
+        }
+      </Badge>
     ),
   },
   {
@@ -60,6 +75,15 @@ export const columns: ColumnDef<Project>[] = [
     cell: ({ row }) => (
       <div className="lowercase">{ row.getValue( "createdAt" )}</div>
     )
+  },
+  {
+    id: "manage",
+    enableHiding: false,
+    cell: ({ row })=> {
+      return (
+        <Button variant="outline" size="sm">Manage</Button>
+      );
+    }
   },
   {
     id: "actions",
@@ -85,7 +109,7 @@ export const columns: ColumnDef<Project>[] = [
               Copy project ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Manage</DropdownMenuItem>
+            <DropdownMenuItem>Edit</DropdownMenuItem>
             <DropdownMenuItem>Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
