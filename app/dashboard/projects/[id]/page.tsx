@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { VariablesDataTable } from "@/components/variables-data-table";
 import { projectService } from "@/services/project.service";
 
 export default async function Page({
@@ -14,7 +16,7 @@ export default async function Page({
 
   return (
     <main>
-      <Item variant="outline">
+      <Item>
         <ItemContent>
           <ItemTitle className="text-lg">{ project.name }</ItemTitle>
           {
@@ -30,13 +32,14 @@ export default async function Page({
           <Button variant="destructive" size="sm">Delete</Button>
         </ItemActions>
       </Item>
-      <Tabs defaultValue="variables">
+      <Separator className="my-2" />
+      <Tabs defaultValue="variables" className="m-4">
         <TabsList>
           <TabsTrigger value="variables">Variables</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
         </TabsList>
         <TabsContent value="variables">
-
+          {/* <VariablesDataTable /> */}
         </TabsContent>
       </Tabs>
       {/* <h2>Project</h2>
