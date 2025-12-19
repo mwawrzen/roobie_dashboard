@@ -12,6 +12,13 @@ export interface Project {
   createdAt: string;
 };
 
+export interface Variable {
+  id: number,
+  key: string;
+  value: string;
+  projectId: number;
+};
+
 export const projectService= {
   getAll: async (): Promise<Project[]>=> {
     const res= await apiFetch( "/projects" );
@@ -25,6 +32,10 @@ export const projectService= {
     const res= await apiFetch( `/project/${ id }`, {
       method: "DELETE"
     });
+    return res.json();
+  },
+  getVariablesById: async ( id: number ): Promise<Variable[]>=> {
+    const res= await apiFetch( `/project/${ id }/variables` );
     return res.json();
   }
 };
