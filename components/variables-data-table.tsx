@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import React from "react";
+import { useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -13,17 +13,10 @@ import {
   type SortingState,
   type VisibilityState,
 } from "@tanstack/react-table";
-import { ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -33,49 +26,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { IconEdit, IconTrash } from "@tabler/icons-react";
+import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
+import { Variable } from "@/services/project.service";
 
-const data: Payment[] = [
-  {
-    id: "m5gr84i9",
-    amount: 316,
-    status: "success",
-    email: "ken99@example.com",
-  },
-  {
-    id: "3u1reuv4",
-    amount: 242,
-    status: "success",
-    email: "Abe45@example.com",
-  },
-  {
-    id: "derv1ws0",
-    amount: 837,
-    status: "processing",
-    email: "Monserrat44@example.com",
-  },
-  {
-    id: "5kma53ae",
-    amount: 874,
-    status: "success",
-    email: "Silas22@example.com",
-  },
-  {
-    id: "bhqecj4p",
-    amount: 721,
-    status: "failed",
-    email: "carmella@example.com",
-  }
-];
-
-export type Payment = {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
-};
-
-export const columns: ColumnDef<Payment>[]= [
+export const columns: ColumnDef<Variable>[]= [
   {
     id: "select",
     header: ({ table }) => (
@@ -102,13 +56,15 @@ export const columns: ColumnDef<Payment>[]= [
     accessorKey: "key",
     header: "Key",
     cell: ({ row }) => (
-      <div className="capitalize">{ row.getValue( "key" )}</div>
+      <div>{ row.getValue( "key" )}</div>
     )
   },
   {
     accessorKey: "value",
     header: "Value",
-    cell: ({ row }) => <div>{ row.getValue( "email" )}</div>
+    cell: ({ row }) => (
+      <div>{ row.getValue( "value" )}</div>
+    )
   },
   {
     id: "actions",
@@ -118,20 +74,20 @@ export const columns: ColumnDef<Payment>[]= [
 
       return (
         <ButtonGroup>
-          <Button><IconEdit /></Button>
-          <Button><IconTrash /></Button>
+          <Button variant="outline"><IconEdit /></Button>
+          <Button variant="destructive"><IconTrash /></Button>
         </ButtonGroup>
       )
     },
   }
 ];
 
-export function VariablesDataTable() {
+export function VariablesDataTable({ data }: { data: Variable[] }) {
 
-  const [ sorting, setSorting ]= React.useState<SortingState>( [] );
-  const [ columnFilters, setColumnFilters ]= React.useState<ColumnFiltersState>( [] );
-  const [ columnVisibility, setColumnVisibility ]= React.useState<VisibilityState>( {} );
-  const [ rowSelection, setRowSelection ]= React.useState( {} );
+  const [ sorting, setSorting ]= useState<SortingState>( [] );
+  const [ columnFilters, setColumnFilters ]= useState<ColumnFiltersState>( [] );
+  const [ columnVisibility, setColumnVisibility ]= useState<VisibilityState>( {} );
+  const [ rowSelection, setRowSelection ]= useState( {} );
 
   const table= useReactTable({
     data,
@@ -150,54 +106,31 @@ export function VariablesDataTable() {
       columnVisibility,
       rowSelection,
     },
-  })
+  });
 
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+          placeholder="Filter keys..."
+          value={( table.getColumn( "key" )?.getFilterValue() as string )?? "" }
+          onChange={ event=>
+            table.getColumn( "key" )?.setFilterValue( event.target.value )
           }
           className="max-w-sm"
         />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                )
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Button className="ml-2" variant="secondary">
+          <IconPlus />
+        </Button>
       </div>
       <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+            {table.getHeaderGroups().map( headerGroup=> (
+              <TableRow key={ headerGroup.id }>
+                {headerGroup.headers.map(header=> {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={ header.id }>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -211,14 +144,14 @@ export function VariablesDataTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+            {table.getRowModel().rows?.length? (
+              table.getRowModel().rows.map( row=> (
                 <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  key={ row.id }
+                  data-state={ row.getIsSelected()&& "selected" }
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                  {row.getVisibleCells().map( cell=> (
+                    <TableCell key={ cell.id }>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -230,7 +163,7 @@ export function VariablesDataTable() {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={ columns.length }
                   className="h-24 text-center"
                 >
                   No results.
