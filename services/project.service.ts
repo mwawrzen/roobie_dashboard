@@ -1,9 +1,15 @@
 import { apiFetch } from "@/lib/api";
 
+export const PROJECT_STATUSES= [ "PLANNED", "ACTIVE", "ARCHIVED" ] as const;
+export type PROJECT_STATUS= typeof PROJECT_STATUSES[ number ];
+
 export interface Project {
-  id: string;
+  id: number;
   name: string;
-  description?: string;
+  description: string| null;
+  apiKey: string;
+  status: PROJECT_STATUS;
+  createdAt: string;
 };
 
 export const projectService= {

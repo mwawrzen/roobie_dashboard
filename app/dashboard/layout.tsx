@@ -1,19 +1,26 @@
-import Link from "next/link";
+import { AppSidebar } from "@/components/app-sidebar";
+import { SiteHeader } from "@/components/site-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <aside className="w-64 bg-slate-900 text-white p-6">
-        <h2 className="text-xl font-bold mb-8">Roobie CMS</h2>
-        <nav className="space-y-4">
-          <Link href="/dashboard" className="block hover:text-blue-400">Statistics</Link>
-          <Link href="/dashboard/projects" className="block hover:text-blue-400">Projects</Link>
-          <Link href="/dashboard/users" className="block hover:text-blue-400">Users</Link>
-        </nav>
-      </aside>
-      <main className="flex-1 p-10">
-        { children }
-      </main>
+      <SidebarProvider
+        style={
+          {
+            "--sidebar-width": "calc( var( --spacing )* 72 )",
+            "--sidebar-height": "calc( var( --spacing )* 12 )",
+          } as React.CSSProperties
+        }
+      >
+        <AppSidebar variant="inset" />
+        <SidebarInset>
+          <SiteHeader />
+          <main className="p-4">
+            { children }
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
     </div>
   );
 };
