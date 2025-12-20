@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/table";
 import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
 import { Variable } from "@/services/project.service";
+import { VariablesDialog } from "./variables-dialog";
 
 export const columns: ColumnDef<Variable>[]= [
   {
@@ -119,6 +120,7 @@ export function VariablesDataTable({ data }: { data: Variable[] }) {
           }
           className="max-w-sm"
         />
+        <VariablesDialog />
         <Button className="ml-2" variant="secondary">
           <IconPlus />
         </Button>

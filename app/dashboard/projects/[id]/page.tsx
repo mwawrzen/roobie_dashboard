@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { VariablesDataTable } from "@/components/variables-data-table";
+import { VariablesDataTable } from "@/components/projects/variables-data-table";
 import { projectService } from "@/services/project.service";
 
 export default async function Page({

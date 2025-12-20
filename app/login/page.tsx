@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect } from "react";
 import { loginAction } from "@/actions/auth";
-import { LoginForm } from "@/components/login-form";
+import { LoginForm } from "@/components/auth/login-form";
 import { toast } from "sonner";
 
 export default function LoginPage() {
