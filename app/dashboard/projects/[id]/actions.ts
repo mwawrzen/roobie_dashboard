@@ -1,8 +1,11 @@
+"use server";
+
 import { projectService } from "@/services/project.service";
 import { revalidatePath } from "next/cache";
 
 export async function addVariableAction(
   projectId: number,
+  prevState: any,
   formData: FormData
 ) {
   const key= formData.get( "key" ) as string;
