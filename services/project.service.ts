@@ -34,6 +34,13 @@ export const projectService= {
     });
     return res.json();
   },
+  addVariable: async ( projectId: number, key: string, value: string )=> {
+    const res= await apiFetch( `/project/${ projectId }/variable`, {
+      method: "POST",
+      body: JSON.stringify({ key, value })
+    });
+    return res.json();
+  },
   getVariablesById: async ( id: number ): Promise<Variable[]>=> {
     const res= await apiFetch( `/project/${ id }/variable` );
     return res.json();
