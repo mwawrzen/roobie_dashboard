@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 const API_URL= "http://localhost:3001/api/v1";
 
@@ -24,6 +25,8 @@ export async function apiFetch( endpoint: string, options: RequestInit= {}) {
   });
 
   if( !response.ok ) {
+    if( response.status=== 401 )
+      redirect( "/login?expired=true" );
     throw new Error(
       messages[ String( response.status )]||
       `Server error: ${ response.status }`
