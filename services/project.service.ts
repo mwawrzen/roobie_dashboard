@@ -49,5 +49,12 @@ export const projectService= {
     await apiFetch( `/project/${ projectId }/variable/${ key }`, {
       method: "DELETE"
     });
+  },
+  editVariable: async ( projectId: number, key: string, value: string )=> {
+    const res= await apiFetch( `/project/${ projectId }/variable`, {
+      method: "PUT",
+      body: JSON.stringify({ key, value })
+    });
+    return res.json();
   }
 };
