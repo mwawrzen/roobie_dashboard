@@ -1,6 +1,16 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 export function proxy( request: NextRequest ) {
+  const hasToken= request.cookies.has( "auth" );
+  const isLoginPage= request.nextUrl.pathname=== "/login";
+  const isExpired= request.nextUrl.searchParams.get( "expired" )=== "true";
+
+  if( isLoginPage&& isExpired&& hasToken ) {
+    const response= NextResponse.next();
+    response.cookies.delete( "auth" );
+    return response;
+  }
+
   const token= request.cookies.get( "auth" );
 
   if( !token&& request.nextUrl.pathname.startsWith( "/dashboard" ))
