@@ -44,5 +44,10 @@ export const projectService= {
   getVariablesById: async ( id: number ): Promise<Variable[]>=> {
     const res= await apiFetch( `/project/${ id }/variable` );
     return res.json();
+  },
+  removeVariable: async ( projectId: number, key: string )=> {
+    await apiFetch( `/project/${ projectId }/variable/${ key }`, {
+      method: "DELETE"
+    });
   }
 };
