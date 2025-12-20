@@ -32,3 +32,23 @@ export async function removeVariableAction( projectId: number, key: string ) {
     return { error: "Error while removing variable" };
   }
 };
+
+export async function editVariableAction(
+  projectId: number,
+  prevState: any,
+  formData: FormData
+) {
+  const key= formData.get( "key" ) as string;
+  const value= formData.get( "value" ) as string;
+
+  if( !key|| !value )
+    return { error: "Key and value required" };
+
+  try {
+    await projectService.editVariable( projectId, key, value );
+    revalidatePath( `/dashboard/projects/${ projectId }` );
+    return { success: true };
+  } catch(_) {
+    return { error: "Error while editing variable" };
+  }
+};
