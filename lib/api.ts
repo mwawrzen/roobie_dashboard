@@ -10,28 +10,33 @@ const messages: Record<string, string>= {
 };
 
 export async function apiFetch( endpoint: string, options: RequestInit= {}) {
-  const cookieStore= await cookies();
-  const token= cookieStore.get( "auth" )?.value;
+  try {
+    const cookieStore= await cookies();
+    const token= cookieStore.get( "auth" )?.value;
 
-  const headers= {
-    "Content-Type": "application/json",
-    ...options.headers,
-    ...( token? { "Cookie": `auth=${ token }` }: {})
-  };
+    const headers= {
+      "Content-Type": "application/json",
+      ...options.headers,
+      ...( token? { "Cookie": `auth=${ token }` }: {})
+    };
 
-  const response= await fetch( `${ API_URL}${ endpoint }`, {
-    ...options,
-    headers
-  });
+    const response= await fetch( `${ API_URL}${ endpoint }`, {
+      ...options,
+      headers
+    });
 
-  if( !response.ok ) {
-    if( response.status=== 401 )
-      redirect( "/login?expired=true" );
-    throw new Error(
-      messages[ String( response.status )]||
-      `Server error: ${ response.status }`
-    );
+    if( !response.ok ) {
+      if( response.status=== 401 )
+        redirect( "/login?expired=true" );
+      throw new Error(
+        messages[ String( response.status )]||
+        `Server error: ${ response.status }`
+      );
+    }
+
+    return response;
+  } catch( error: any ) {
+    if( error.message=== "fetch failed" )
+      throw new Error( "Connection error" );
   }
-
-  return response;
 };
