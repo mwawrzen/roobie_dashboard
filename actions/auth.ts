@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 
 export async function loginAction( state: any, formData: FormData ) {
 
+  let isSuccess: boolean= false;
+
   try {
     const email= formData.get( "email" );
     const password= formData.get( "password" );
@@ -28,10 +30,13 @@ export async function loginAction( state: any, formData: FormData ) {
       path: "/"
     });
 
-    redirect( "/dashboard" );
+    isSuccess= true;
   } catch(_) {
     return { error: "Cannot connect to the server. Try again later." };
   }
+
+  if( isSuccess )
+    redirect( "/dashboard" );
 };
 
 export async function logoutAction() {
