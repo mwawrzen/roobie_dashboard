@@ -72,17 +72,35 @@ export const columns: ColumnDef<Variable>[]= [
     id: "actions",
     enableHiding: false,
     cell: ({ row, table }) => {
-      const variable = row.original;
-      const { projectId }= table.options.meta as { projectId: number };
+      const { key } = row.original;
+      const {
+        projectId,
+        openDialog,
+        setDialogType,
+        setCurrentVariable
+      }= table.options.meta as {
+        projectId: number,
+        openDialog: ()=> void,
+        setDialogType: ( type: "Add"| "Edit" )=> void,
+        setCurrentVariable: ( {}: Variable )=> void
+      };
 
       return (
         <ButtonGroup>
-          <Button variant="outline"><IconEdit /></Button>
+          <Button
+            variant="outline"
+            onClick={ ()=> {
+              setCurrentVariable( row.original );
+              setDialogType( "Edit" );
+              openDialog()
+            }}
+          >
+            <IconEdit />
+          </Button>
           <Button
             variant="destructive"
             onClick={ async ()=> {
-              const result= await removeVariableAction( projectId, variable.key );
-              console.log( result );
+              await removeVariableAction( projectId, key );
             }}
           >
             <IconTrash />
@@ -106,6 +124,11 @@ export function VariablesDataTable({
   const [ columnVisibility, setColumnVisibility ]= useState<VisibilityState>( {} );
   const [ rowSelection, setRowSelection ]= useState( {} );
   const [ dialogOpen, setDialogOpen ]= useState<boolean>( false );
+  const [ dialogType, setDialogType ]= useState<"Add"| "Edit">( "Add" );
+  const [ currentVariable, setCurrentVariable ]= useState<Variable| undefined>();
+
+  const openDialog= ()=> setDialogOpen( true );
+  const closeDialog= ()=> setDialogOpen( false );
 
   const table= useReactTable({
     data,
@@ -125,12 +148,12 @@ export function VariablesDataTable({
       rowSelection,
     },
     meta: {
-      projectId
+      projectId,
+      openDialog,
+      setDialogType,
+      setCurrentVariable
     }
   });
-
-  const openDialog= ()=> setDialogOpen( true );
-  const closeDialog= ()=> setDialogOpen( false );
 
   return (
     <div className="w-full">
@@ -146,14 +169,19 @@ export function VariablesDataTable({
         <Button
           className="ml-2"
           variant="secondary"
-          onClick={ openDialog }
+          onClick={ ()=> {
+            setCurrentVariable( undefined );
+            setDialogType( "Add" );
+            openDialog();
+          }}
         >
           <IconPlus />
         </Button>
         <VariablesDialog
-          title="Add Variable"
-          open={ dialogOpen }
-          closeAction={ closeDialog }
+          type={ dialogType }
+          variable={ currentVariable }
+          isOpen={ dialogOpen }
+          close={ closeDialog }
         />
       </div>
       <div className="overflow-hidden rounded-md border">
