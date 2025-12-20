@@ -4,29 +4,34 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export async function loginAction( state: any, formData: FormData ) {
-  const email= formData.get( "email" );
-  const password= formData.get( "password" );
 
-  const res= await fetch( "http://localhost:3001/api/v1/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
-  });
+  try {
+    const email= formData.get( "email" );
+    const password= formData.get( "password" );
 
-  if( !res.ok )
-    return { error: "Wrong login data" };
+    const res= await fetch( "http://localhost:3001/api/v1/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
 
-  const { token }= await res.json();
+    if( !res.ok )
+      return { error: "Wrong login data. Please try again." };
 
-  const cookieStore= await cookies();
-  cookieStore.set( "auth", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV=== "production",
-    sameSite: "lax",
-    path: "/"
-  });
+    const { token }= await res.json();
 
-  redirect( "/dashboard" );
+    const cookieStore= await cookies();
+    cookieStore.set( "auth", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV=== "production",
+      sameSite: "lax",
+      path: "/"
+    });
+
+    redirect( "/dashboard" );
+  } catch(_) {
+    return { error: "Cannot connect to the server. Try again later." };
+  }
 };
 
 export async function logoutAction() {
