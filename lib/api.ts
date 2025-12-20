@@ -38,5 +38,6 @@ export async function apiFetch( endpoint: string, options: RequestInit= {}) {
   } catch( error: any ) {
     if( error.message=== "fetch failed" )
       throw new Error( "Connection error" );
+    throw error;
   }
 };
