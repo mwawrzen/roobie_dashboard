@@ -120,10 +120,14 @@ export function VariablesDataTable({ data }: { data: Variable[] }) {
           }
           className="max-w-sm"
         />
-        <VariablesDialog />
-        <Button className="ml-2" variant="secondary">
-          <IconPlus />
-        </Button>
+        <VariablesDialog
+          title="Add variable"
+          trigger={
+            <Button className="ml-2" variant="secondary">
+              <IconPlus />
+            </Button>
+          }
+        />
       </div>
       <div className="overflow-hidden rounded-md border">
         <Table>
