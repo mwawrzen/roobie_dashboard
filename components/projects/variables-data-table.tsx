@@ -29,6 +29,7 @@ import {
 import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
 import { Variable } from "@/services/project.service";
 import { VariablesDialog } from "./variables-dialog";
+import { removeVariableAction } from "@/app/dashboard/projects/[id]/actions";
 
 export const columns: ColumnDef<Variable>[]= [
   {
@@ -70,20 +71,35 @@ export const columns: ColumnDef<Variable>[]= [
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const variable = row.original;
+      const { projectId }= table.options.meta as { projectId: number };
 
       return (
         <ButtonGroup>
           <Button variant="outline"><IconEdit /></Button>
-          <Button variant="destructive"><IconTrash /></Button>
+          <Button
+            variant="destructive"
+            onClick={ async ()=> {
+              const result= await removeVariableAction( projectId, variable.key );
+              console.log( result );
+            }}
+          >
+            <IconTrash />
+          </Button>
         </ButtonGroup>
       )
     },
   }
 ];
 
-export function VariablesDataTable({ data }: { data: Variable[] }) {
+export function VariablesDataTable({
+  projectId,
+  data
+}: {
+  projectId: string,
+  data: Variable[]
+}) {
 
   const [ sorting, setSorting ]= useState<SortingState>( [] );
   const [ columnFilters, setColumnFilters ]= useState<ColumnFiltersState>( [] );
@@ -108,6 +124,9 @@ export function VariablesDataTable({ data }: { data: Variable[] }) {
       columnVisibility,
       rowSelection,
     },
+    meta: {
+      projectId
+    }
   });
 
   const openDialog= ()=> setDialogOpen( true );
