@@ -36,7 +36,6 @@ export function LoginForm({
           <form action={ action }>
             <FieldGroup className="gap-2">
               <Field>
-                {/* <FieldLabel htmlFor="email">Email</FieldLabel> */}
                 <Input
                   id="email"
                   name="email"
@@ -48,13 +47,6 @@ export function LoginForm({
               </Field>
               <Field>
                 <div className="flex items-center">
-                  {/* <FieldLabel htmlFor="password">Password</FieldLabel> */}
-                  {/* <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a> */}
                 </div>
                 <Input
                   id="password"
@@ -69,9 +61,6 @@ export function LoginForm({
                 <Button type="submit" className="mt-4">
                   { isPending? "Logging in...": "Login" }
                 </Button>
-                {/* <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="#">Sign up</a>
-                </FieldDescription> */}
               </Field>
             </FieldGroup>
           </form>
