@@ -18,7 +18,17 @@ export async function addVariableAction(
     await projectService.addVariable( projectId, key, value );
     revalidatePath( `/dashboard/projects/${ projectId }` );
     return { success: true };
-  } catch( e ) {
+  } catch(_) {
     return { error: "Error while adding variable" };
+  }
+};
+
+export async function removeVariableAction( projectId: number, key: string ) {
+  try {
+    await projectService.removeVariable( projectId, key );
+    revalidatePath( `/dashboard/projects/${ projectId }` );
+    return { success: true };
+  } catch(_) {
+    return { error: "Error while removing variable" };
   }
 };
