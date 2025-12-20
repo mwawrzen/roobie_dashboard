@@ -2,11 +2,14 @@
 
 import { useActionState } from "react";
 import { useParams } from "next/navigation";
-import { IconPlus } from "@tabler/icons-react";
-import { addVariableAction } from "@/app/dashboard/projects/[id]/actions";
+import {
+  addVariableAction,
+  editVariableAction
+} from "@/app/dashboard/projects/[id]/actions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -15,16 +18,19 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Variable } from "@/services/project.service";
 
 
 export function VariablesDialog({
-  title,
-  open,
-  closeAction
+  type,
+  variable,
+  isOpen,
+  close
 }: {
-  title: string,
-  open: boolean,
-  closeAction: ()=> void
+  type: "Edit"| "Add",
+  variable?: Variable,
+  isOpen: boolean,
+  close: ()=> void
 }) {
 
   const params= useParams();
@@ -32,25 +38,41 @@ export function VariablesDialog({
 
   const [ state, formAction, isPending ]= useActionState(
     async ( prevState: any, formData: FormData )=> {
-      return await addVariableAction( projectId, prevState, formData )
+      if( type=== "Add")
+        return await addVariableAction( projectId, prevState, formData );
+      return await editVariableAction( projectId, prevState, formData );
     }, null
   );
 
   return (
-    <Dialog open={ open }>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog open={ isOpen }>
+      <DialogContent className="sm:max-w-[425px]" showCloseButton={ false }>
         <form action={ formAction }>
           <DialogHeader>
-            <DialogTitle>{ title }</DialogTitle>
+            <DialogTitle>{ type } Variable</DialogTitle>
             <DialogDescription></DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 my-4">
-            <Input id="key" name="key" placeholder="key" />
-            <Textarea id="value" name="value" placeholder="value" />
+            <Input
+              id="key"
+              name="key"
+              placeholder="key"
+              defaultValue={ variable?.key || "" }
+            />
+            <Textarea
+              id="value"
+              name="value"
+              placeholder="value"
+              defaultValue={ variable?.value || "" }
+            />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={ closeAction }>Cancel</Button>
-            <Button type="submit" onClick={ closeAction }>Add</Button>
+            <DialogClose asChild>
+              <Button variant="outline" onClick={ close }>Cancel</Button>
+            </DialogClose>
+            <Button type="submit" onClick={ close }>
+              { type }
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
