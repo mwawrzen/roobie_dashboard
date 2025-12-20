@@ -10,7 +10,7 @@ export default function LoginPage() {
 
   useEffect( ()=> {
     if( state?.error )
-      toast.error( "Wrong login data. Please try again" );
+      toast.error( state.error );
   }, [ state ]);
 
   return (
