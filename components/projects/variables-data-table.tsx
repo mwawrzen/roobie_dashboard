@@ -89,6 +89,7 @@ export function VariablesDataTable({ data }: { data: Variable[] }) {
   const [ columnFilters, setColumnFilters ]= useState<ColumnFiltersState>( [] );
   const [ columnVisibility, setColumnVisibility ]= useState<VisibilityState>( {} );
   const [ rowSelection, setRowSelection ]= useState( {} );
+  const [ dialogOpen, setDialogOpen ]= useState<boolean>( false );
 
   const table= useReactTable({
     data,
@@ -109,6 +110,9 @@ export function VariablesDataTable({ data }: { data: Variable[] }) {
     },
   });
 
+  const openDialog= ()=> setDialogOpen( true );
+  const closeDialog= ()=> setDialogOpen( false );
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
@@ -120,13 +124,17 @@ export function VariablesDataTable({ data }: { data: Variable[] }) {
           }
           className="max-w-sm"
         />
+        <Button
+          className="ml-2"
+          variant="secondary"
+          onClick={ openDialog }
+        >
+          <IconPlus />
+        </Button>
         <VariablesDialog
-          title="Add variable"
-          trigger={
-            <Button className="ml-2" variant="secondary">
-              <IconPlus />
-            </Button>
-          }
+          title="Add Variable"
+          open={ dialogOpen }
+          closeAction={ closeDialog }
         />
       </div>
       <div className="overflow-hidden rounded-md border">
