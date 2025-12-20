@@ -39,15 +39,9 @@ export default async function Page({
           <TabsTrigger value="users">Users</TabsTrigger>
         </TabsList>
         <TabsContent value="variables">
-          <VariablesDataTable data={ variables } />
+          <VariablesDataTable projectId={ id } data={ variables } />
         </TabsContent>
       </Tabs>
-      {/* <h2>Project</h2>
-      <p>ID: { id }</p>
-      <p>Name: { name }</p>
-      <p>Description: { description|| "---" }</p>
-      <p>Status: { status }</p>
-      <p>Created: { createdAt }</p> */}
     </main>
   );
 };
