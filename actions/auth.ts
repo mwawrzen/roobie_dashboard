@@ -1,15 +1,23 @@
 "use server";
 
+import { ActionResponse } from "@/app/interfaces";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-export async function loginAction( state: any, formData: FormData ) {
-
-  let isSuccess: boolean= false;
-
+export async function loginAction(
+  state: any,
+  formData: FormData
+): Promise< ActionResponse > {
   try {
-    const email= formData.get( "email" );
-    const password= formData.get( "password" );
+    const email= formData.get( "email" )?.toString().trim();
+    const password= formData.get( "password" )?.toString().trim();
+
+    if( !email|| !password ) {
+      return {
+        success: false,
+        message: "Email and password are required"
+      };
+    }
 
     const res= await fetch( "http://localhost:3001/api/v1/login", {
       method: "POST",
@@ -17,12 +25,24 @@ export async function loginAction( state: any, formData: FormData ) {
       body: JSON.stringify({ email, password })
     });
 
-    if( !res.ok )
-      return { error: "Wrong login data. Please try again." };
+    if( res.status=== 401 ) {
+      return {
+        success: false,
+        message: "Wrong login data. Please try again."
+      };
+    }
+
+    if( !res.ok ) {
+      return {
+        success: false,
+        message: "Error while logging in"
+      };
+    }
 
     const { token }= await res.json();
 
     const cookieStore= await cookies();
+
     cookieStore.set( "auth", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV=== "production",
@@ -30,13 +50,17 @@ export async function loginAction( state: any, formData: FormData ) {
       path: "/"
     });
 
-    isSuccess= true;
-  } catch(_) {
-    return { error: "Cannot connect to the server. Try again later." };
+    return {
+      success: true,
+      message: "Successfully logged in"
+    };
+  } catch( error ) {
+    console.error( error );
+    return {
+      success: false,
+      message: "Cannot connect to the server. Try again later"
+    };
   }
-
-  if( isSuccess )
-    redirect( "/dashboard" );
 };
 
 export async function logoutAction() {
