@@ -3,12 +3,6 @@ import { redirect } from "next/navigation";
 
 const API_URL= "http://localhost:3001/api/v1";
 
-const messages: Record<string, string>= {
-  "401": "You have to be logged in",
-  "403": "You don't have access to this resource",
-  "404": "Resource not found"
-};
-
 export async function apiFetch( endpoint: string, options: RequestInit= {}) {
   try {
     const cookieStore= await cookies();
