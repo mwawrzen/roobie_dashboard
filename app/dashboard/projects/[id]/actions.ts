@@ -26,10 +26,16 @@ export async function addVariableAction(
 export async function removeVariableAction( projectId: number, key: string ) {
   try {
     await projectService.removeVariable( projectId, key );
-    revalidatePath( `/dashboard/projects/${ projectId }` );
-    return { success: true };
-  } catch(_) {
-    return { error: "Error while removing variable" };
+    revalidateTag( `variables-${ projectId }`, "max" );
+    return {
+      success: true,
+      message: "Variable successfully removed"
+    };
+  } catch( e: any ) {
+    return {
+      success: false,
+      message: "Error while removing variable"
+    };
   }
 };
 
