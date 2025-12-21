@@ -39,8 +39,8 @@ export function VariablesDialog({
   const [ state, formAction, isPending ]= useActionState(
     async ( prevState: any, formData: FormData )=> {
       if( type=== "Add")
-        return await addVariableAction( projectId, prevState, formData );
-      return await editVariableAction( projectId, prevState, formData );
+        return await addVariableAction( projectId, formData );
+      return await editVariableAction( projectId, formData );
     }, null
   );
 
