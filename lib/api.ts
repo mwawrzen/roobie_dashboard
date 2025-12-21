@@ -28,15 +28,12 @@ export async function apiFetch( endpoint: string, options: RequestInit= {}) {
     if( !response.ok ) {
       if( response.status=== 401 )
         redirect( "/login?expired=true" );
-      throw new Error(
-        messages[ String( response.status )]||
-        `Server error: ${ response.status }`
-      );
+      throw new Error( response.statusText );
     }
 
     return response;
   } catch( error: any ) {
-    if( error.message=== "fetch failed" )
+    if( error.cause?.code=== "ECONNREFUSED" )
       throw new Error( "Connection error" );
     throw error;
   }
