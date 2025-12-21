@@ -19,6 +19,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Variable } from "@/services/project.service";
+import { toast } from "sonner";
+import { ActionResponse } from "@/app/interfaces";
 
 
 export function VariablesDialog({
@@ -33,15 +35,29 @@ export function VariablesDialog({
   close: ()=> void
 }) {
 
-  const params= useParams();
-  const projectId= Number( params.id );
+  const projectId= Number( useParams().id );
 
-  const [ state, formAction, isPending ]= useActionState(
-    async ( prevState: any, formData: FormData )=> {
-      if( type=== "Add")
-        return await addVariableAction( projectId, formData );
-      return await editVariableAction( projectId, formData );
-    }, null
+  if( isNaN( projectId )) {
+    toast.error( "Wrong project id parameter" );
+    return null;
+  }
+
+  const [ _state, formAction, isPending ]= useActionState(
+    async ( _prevState: any, formData: FormData )=> {
+
+      let res: ActionResponse| null= null;
+
+      if( type=== "Add" )
+        res= await addVariableAction( projectId, formData );
+      else
+        res= await editVariableAction( projectId, formData );
+
+      if( res.success )
+        toast.success( res.message );
+      else
+        toast.error( res.message );
+    },
+    null
   );
 
   return (
@@ -70,7 +86,7 @@ export function VariablesDialog({
             <DialogClose asChild>
               <Button variant="outline" onClick={ close }>Cancel</Button>
             </DialogClose>
-            <Button type="submit" onClick={ close }>
+            <Button type="submit" onClick={ close } disabled={ isPending }>
               { type }
             </Button>
           </DialogFooter>
