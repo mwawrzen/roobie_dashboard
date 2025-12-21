@@ -18,7 +18,7 @@ export default function LoginPage() {
       toast.success( state.message, { position: "top-center", duration: 1200 });
       router.push( "/dashboard" );
     } else {
-      toast.error( state.message, { position: "top-center", duration: 2 });
+      toast.error( state.message, { position: "top-center" });
     }
   }, [ state ]);
 
