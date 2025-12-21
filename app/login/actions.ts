@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export async function loginAction(
-  state: any,
+  _state: any,
   formData: FormData
 ): Promise< ActionResponse > {
   try {
