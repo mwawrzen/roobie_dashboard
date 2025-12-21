@@ -1,7 +1,7 @@
 "use server";
 
 import { projectService } from "@/services/project.service";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 
 export async function addVariableAction(
   projectId: number,
@@ -16,7 +16,7 @@ export async function addVariableAction(
 
   try {
     await projectService.addVariable( projectId, key, value );
-    revalidatePath( `/dashboard/projects/${ projectId }` );
+    revalidateTag( `variables-${ projectId }`, "max" );
     return { success: true };
   } catch(_) {
     return { error: "Error while adding variable" };
@@ -46,7 +46,7 @@ export async function editVariableAction(
 
   try {
     await projectService.editVariable( projectId, key, value );
-    revalidatePath( `/dashboard/projects/${ projectId }` );
+    revalidateTag( `variables-${ projectId }`, "max" );
     return { success: true };
   } catch(_) {
     return { error: "Error while editing variable" };
