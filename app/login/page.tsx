@@ -4,13 +4,22 @@ import { useActionState, useEffect } from "react";
 import { loginAction } from "@/actions/auth";
 import { LoginForm } from "@/components/auth/login-form";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+
+  const router= useRouter();
   const [ state, formAction, isPending ]= useActionState( loginAction, null );
 
   useEffect( ()=> {
-    if( state?.error )
-      toast.error( state.error );
+    if( !state ) return;
+
+    if( state.success ) {
+      toast.success( state.message, { position: "top-center", duration: 1200 });
+      router.push( "/dashboard" );
+    } else {
+      toast.error( state.message, { position: "top-center", duration: 2 });
+    }
   }, [ state ]);
 
   return (
