@@ -42,13 +42,21 @@ export const projectService= {
     return res.json();
   },
   getVariablesById: async ( id: number ): Promise<Variable[]>=> {
-    const res= await apiFetch( `/project/${ id }/variable` );
+    const res= await apiFetch( `/project/${ id }/variable`, {
+      next: { tags: [ `variables-${ id }` ]}
+    });
     return res.json();
   },
   removeVariable: async ( projectId: number, key: string )=> {
-    await apiFetch( `/project/${ projectId }/variable/${ key }`, {
-      method: "DELETE"
-    });
+    try {
+      const res= await apiFetch( `/project/${ projectId }/variable/${ key }`, {
+        method: "DELETE"
+      });
+
+      return res.text();
+    } catch( e ) {
+      throw e;
+    }
   },
   editVariable: async ( projectId: number, key: string, value: string )=> {
     const res= await apiFetch( `/project/${ projectId }/variable`, {
