@@ -153,7 +153,7 @@ export function VariablesDataTable({
     const res= await removeVariableAction( projectId, key );
 
     if( res.success ) {
-      toast( res.message );
+      toast.success( res.message );
     } else {
       setRows( prevRows );
       toast.error( res.message );
