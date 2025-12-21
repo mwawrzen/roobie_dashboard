@@ -1,17 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
   type ColumnDef,
-  type ColumnFiltersState,
-  type SortingState,
-  type VisibilityState,
+  type ColumnFiltersState
 } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
@@ -26,10 +22,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
 import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
 import { Variable } from "@/services/project.service";
-import { VariablesDialog } from "./variables-dialog";
+import { VariablesDialog } from "@/components/projects/variables-dialog";
 import { removeVariableAction } from "@/app/dashboard/projects/[id]/actions";
+import { toast } from "sonner";
 
 export const columns: ColumnDef<Variable>[]= [
   {
@@ -50,9 +58,7 @@ export const columns: ColumnDef<Variable>[]= [
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
       />
-    ),
-    enableSorting: false,
-    enableHiding: false,
+    )
   },
   {
     accessorKey: "key",
@@ -70,16 +76,16 @@ export const columns: ColumnDef<Variable>[]= [
   },
   {
     id: "actions",
-    enableHiding: false,
     cell: ({ row, table }) => {
       const { key } = row.original;
       const {
-        projectId,
+        handleDelete,
         openDialog,
         setDialogType,
         setCurrentVariable
       }= table.options.meta as {
         projectId: number,
+        handleDelete: ( key: string )=> void;
         openDialog: ()=> void,
         setDialogType: ( type: "Add"| "Edit" )=> void,
         setCurrentVariable: ( {}: Variable )=> void
@@ -97,17 +103,30 @@ export const columns: ColumnDef<Variable>[]= [
           >
             <IconEdit />
           </Button>
-          <Button
-            variant="destructive"
-            onClick={ async ()=> {
-              await removeVariableAction( projectId, key );
-            }}
-          >
-            <IconTrash />
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive">
+                <IconTrash />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This variable will be permanently removed.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={ ()=> handleDelete( key )}>
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </ButtonGroup>
       )
-    },
+    }
   }
 ];
 
@@ -115,40 +134,56 @@ export function VariablesDataTable({
   projectId,
   data
 }: {
-  projectId: string,
+  projectId: number,
   data: Variable[]
 }) {
 
-  const [ sorting, setSorting ]= useState<SortingState>( [] );
+  const [ rows, setRows ]= useState<Variable[]>( ()=> data );
+
+  useEffect( ()=> {
+    if( data!== rows )
+      setRows( data );
+  }, [ data, rows ])
+
+  const handleDelete= async ( key: string )=> {
+    const prevRows= rows;
+
+    setRows( prev=> prev.filter( row=> row.key!== key ));
+
+    const res= await removeVariableAction( projectId, key );
+
+    if( res.success ) {
+      toast( res.message );
+    } else {
+      setRows( prevRows );
+      toast.error( res.message );
+    }
+  };
+
   const [ columnFilters, setColumnFilters ]= useState<ColumnFiltersState>( [] );
-  const [ columnVisibility, setColumnVisibility ]= useState<VisibilityState>( {} );
   const [ rowSelection, setRowSelection ]= useState( {} );
   const [ dialogOpen, setDialogOpen ]= useState<boolean>( false );
   const [ dialogType, setDialogType ]= useState<"Add"| "Edit">( "Add" );
   const [ currentVariable, setCurrentVariable ]= useState<Variable| undefined>();
 
-  const openDialog= ()=> setDialogOpen( true );
-  const closeDialog= ()=> setDialogOpen( false );
+  const openDialog= useCallback( ()=> setDialogOpen( true ), [] );
+  const closeDialog= useCallback( ()=> setDialogOpen( false ), [] );
+
+  const memoizedColumns= useMemo( ()=> columns, [] );
 
   const table= useReactTable({
     data,
-    columns,
-    onSortingChange: setSorting,
+    columns: memoizedColumns,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
-      sorting,
       columnFilters,
-      columnVisibility,
-      rowSelection,
+      rowSelection
     },
     meta: {
-      projectId,
+      handleDelete,
       openDialog,
       setDialogType,
       setCurrentVariable
@@ -233,30 +268,6 @@ export function VariablesDataTable({
             )}
           </TableBody>
         </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
       </div>
     </div>
   )
