@@ -13,6 +13,10 @@ export default async function Page({
   const { id }= await params;
   const project= await projectService.getById( +id );
   const variables= await projectService.getVariablesById( +id );
+  const [ project, variables ]= await Promise.all([
+    projectService.getById( id ),
+    projectService.getVariablesById( id )
+  ]);
 
   return (
     <main>
