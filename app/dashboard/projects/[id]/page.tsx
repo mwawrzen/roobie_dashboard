@@ -4,15 +4,19 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VariablesDataTable } from "@/components/projects/variables-data-table";
 import { projectService } from "@/services/project.service";
+import { notFound } from "next/navigation";
 
 export default async function Page({
   params
 }: {
   params: Promise<{ id: string }>
 }) {
-  const { id }= await params;
-  const project= await projectService.getById( +id );
-  const variables= await projectService.getVariablesById( +id );
+
+  const id= Number(( await params ).id );
+
+  if( !Number.isInteger( id )|| id<= 0 )
+    notFound();
+
   const [ project, variables ]= await Promise.all([
     projectService.getById( id ),
     projectService.getVariablesById( id )
