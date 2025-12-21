@@ -1,29 +1,42 @@
 "use server";
 
+import { ActionResponse } from "@/app/interfaces";
 import { projectService } from "@/services/project.service";
 import { revalidateTag } from "next/cache";
 
 export async function addVariableAction(
   projectId: number,
-  prevState: any,
   formData: FormData
-) {
-  const key= formData.get( "key" ) as string;
-  const value= formData.get( "value" ) as string;
-
-  if( !key|| !value )
-    return { error: "Key and value required" };
-
+): Promise< ActionResponse > {
   try {
+    const key= formData.get( "key" ) as string;
+    const value= formData.get( "value" ) as string;
+
+    if( !key|| !value ) {
+      return {
+        success: false,
+        message: "Key and value required"
+      };
+    }
+
     await projectService.addVariable( projectId, key, value );
     revalidateTag( `variables-${ projectId }`, "max" );
-    return { success: true };
+    return {
+      success: true,
+      message: "Variable successfully added"
+    };
   } catch(_) {
-    return { error: "Error while adding variable" };
+    return {
+      success: false,
+      message: "Error while adding variable"
+    };
   }
 };
 
-export async function removeVariableAction( projectId: number, key: string ) {
+export async function removeVariableAction(
+  projectId: number,
+  key: string
+): Promise< ActionResponse > {
   try {
     await projectService.removeVariable( projectId, key );
     revalidateTag( `variables-${ projectId }`, "max" );
@@ -31,7 +44,7 @@ export async function removeVariableAction( projectId: number, key: string ) {
       success: true,
       message: "Variable successfully removed"
     };
-  } catch( e: any ) {
+  } catch(_) {
     return {
       success: false,
       message: "Error while removing variable"
@@ -41,20 +54,29 @@ export async function removeVariableAction( projectId: number, key: string ) {
 
 export async function editVariableAction(
   projectId: number,
-  prevState: any,
   formData: FormData
-) {
-  const key= formData.get( "key" ) as string;
-  const value= formData.get( "value" ) as string;
-
-  if( !key|| !value )
-    return { error: "Key and value required" };
-
+): Promise< ActionResponse > {
   try {
+    const key= formData.get( "key" )?.toString().trim();
+    const value= formData.get( "value" )?.toString().trim();
+
+    if( !key|| !value ) {
+      return {
+        success: false,
+        message: "Key and value required"
+      };
+    }
+
     await projectService.editVariable( projectId, key, value );
     revalidateTag( `variables-${ projectId }`, "max" );
-    return { success: true };
+    return {
+      success: true,
+      message: "Variable successfully edited"
+    };
   } catch(_) {
-    return { error: "Error while editing variable" };
+    return {
+      success: false,
+      message: "Error while editing variable"
+    };
   }
 };
