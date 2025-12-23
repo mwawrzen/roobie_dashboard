@@ -126,20 +126,10 @@ export function ProjectsDataTable({ data }: { data: Project[] }) {
   const table = useReactTable({
     data,
     columns,
-    // onSortingChange: setSorting,
-    // onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    // onColumnVisibilityChange: setColumnVisibility,
-    // onRowSelectionChange: setRowSelection,
-    state: {
-      // sorting,
-      // columnFilters,
-      // columnVisibility,
-      // rowSelection,
-    },
+    getFilteredRowModel: getFilteredRowModel()
   });
 
   return (
@@ -168,10 +158,7 @@ export function ProjectsDataTable({ data }: { data: Project[] }) {
             {
               table.getRowModel().rows?.length? (
                 table.getRowModel().rows.map( row=> (
-                  <TableRow
-                    key={ row.id }
-                    // data-state={ row.getIsSelected() && "selected" }
-                  >
+                  <TableRow key={ row.id }>
                     {
                       row.getVisibleCells().map( cell=> (
                         <TableCell key={ cell.id }>
