@@ -27,6 +27,7 @@ export async function apiFetch( endpoint: string, options: RequestInit= {}) {
 
     return response;
   } catch( error: any ) {
+    console.error( error );
     if( error.cause?.code=== "ECONNREFUSED" )
       throw new Error( "Connection error" );
     throw error;
