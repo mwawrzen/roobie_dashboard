@@ -30,13 +30,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Project } from "@/services/project.service";
-import { IconArchive, IconCalendarTime, IconCircleCheckFilled, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconArchive, IconCalendarTime, IconCircleCheckFilled, IconMistOff, IconPlus, IconTrash } from "@tabler/icons-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { ProjectDialog } from "./project-dialog";
 import { removeProjectAction } from "@/app/dashboard/projects/actions";
 import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty";
 
 export const columns: ColumnDef<Project>[] = [
   {
@@ -225,79 +226,96 @@ export function ProjectsDataTable({ data }: { data: Project[] }) {
 
   return (
     <div className="w-full">
-      <header className="mb-4">
-        <Button
-          variant="secondary"
-          size="default"
-          onClick={ ()=> {
-            setCurrentProject( undefined )
-            setDialogType( "Create" )
-            openDialog();
-          }}
-        >
-          <IconPlus />
-          Create
-        </Button>
-        <ProjectDialog
-          type={ dialogType }
-          project={ currentProject }
-          isOpen={ dialogOpen }
-          close={ closeDialog }
-        />
-      </header>
-      <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader>
-            { table.getHeaderGroups().map( headerGroup=> (
-              <TableRow key={ headerGroup.id }>
-                { headerGroup.headers.map( header=> {
-                  return (
-                    <TableHead key={ header.id }>
-                      {
-                        header.isPlaceholder ? null: flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )
-                      }
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {
-              table.getRowModel().rows?.length? (
-                table.getRowModel().rows.map( row=> (
-                  <TableRow key={ row.id }>
-                    {
-                      row.getVisibleCells().map( cell=> (
-                        <TableCell key={ cell.id }>
+      {!rows.length? (
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <IconMistOff />
+            </EmptyMedia>
+            <EmptyTitle>No projects</EmptyTitle>
+            <EmptyDescription>
+              There are no project. You can create one by clicking button down below.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button
+              onClick={ ()=> {
+                setDialogType( "Create" );
+                openDialog();
+              }}
+            >
+              Create project
+            </Button>
+          </EmptyContent>
+        </Empty>
+      ): (
+        <>
+          <header className="mb-4">
+            <Button
+              variant="secondary"
+              size="default"
+              onClick={ ()=> {
+                setCurrentProject( undefined )
+                setDialogType( "Create" )
+                openDialog();
+              }}
+            >
+              <IconPlus />
+              Create
+            </Button>
+          </header>
+          <div className="overflow-hidden rounded-md border">
+            <Table>
+              <TableHeader>
+                { table.getHeaderGroups().map( headerGroup=> (
+                  <TableRow key={ headerGroup.id }>
+                    { headerGroup.headers.map( header=> {
+                      return (
+                        <TableHead key={ header.id }>
                           {
-                            flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
+                            header.isPlaceholder ? null: flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
                             )
                           }
-                        </TableCell>
-                      ))
-                    }
+                        </TableHead>
+                      )
+                    })}
                   </TableRow>
-                ))
-              ): (
-                <TableRow>
-                  <TableCell
-                    colSpan={ columns.length }
-                    className="h-24 text-center"
-                  >
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )
-            }
-          </TableBody>
-        </Table>
-      </div>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {
+                  table.getRowModel().rows?.length? (
+                    table.getRowModel().rows.map( row=> (
+                      <TableRow key={ row.id }>
+                        {
+                          row.getVisibleCells().map( cell=> (
+                            <TableCell key={ cell.id }>
+                              {
+                                flexRender(
+                                  cell.column.columnDef.cell,
+                                  cell.getContext()
+                                )
+                              }
+                            </TableCell>
+                          ))
+                        }
+                      </TableRow>
+                    ))
+                  ): null
+                }
+              </TableBody>
+            </Table>
+          </div>
+        </>
+      )}
+      <ProjectDialog
+        type={ dialogType }
+        project={ currentProject }
+        isOpen={ dialogOpen }
+        close={ closeDialog }
+      />
     </div>
   );
 };
