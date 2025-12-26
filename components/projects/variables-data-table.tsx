@@ -83,9 +83,14 @@ export const columns: ColumnDef<Variable>[]= [
   {
     accessorKey: "value",
     header: "Value",
-    cell: ({ row })=> (
-      <div>{ row.getValue( "value" )}</div>
-    )
+    cell: ({ row })=> {
+      let value: string= row.getValue( "value" );
+
+      if( value.length> 50 )
+        value= value.slice( 0, 50 )+ "...";
+
+      return <div>{ value }</div>;
+    }
   },
   {
     id: "actions",
