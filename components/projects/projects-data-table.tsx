@@ -30,15 +30,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Project } from "@/services/project.service";
-import { IconArchive, IconCalendarTime, IconCircleCheckFilled } from "@tabler/icons-react";
+import { IconArchive, IconCalendarTime, IconCircleCheckFilled, IconPlus, IconTrash } from "@tabler/icons-react";
 import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
+import { ProjectDialog } from "./project-dialog";
+import { removeProjectAction } from "@/app/dashboard/projects/actions";
+import { toast } from "sonner";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
 
 export const columns: ColumnDef<Project>[] = [
   {
     accessorKey: "id",
     header: "ID",
     cell: ({ row }) => (
-      <div className="capitalize">{ row.getValue( "id" )}</div>
+      <div>{ row.getValue( "id" )}</div>
     ),
     enableSorting: false,
     enableHiding: false,
@@ -47,7 +52,14 @@ export const columns: ColumnDef<Project>[] = [
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => (
-      <div className="capitalize">{ row.getValue( "name" )}</div>
+      <div>{ row.getValue( "name" )}</div>
+    ),
+  },
+  {
+    accessorKey: "description",
+    header: "Description",
+    cell: ({ row }) => (
+      <div>{ row.getValue( "description" )}</div>
     ),
   },
   {
@@ -91,31 +103,75 @@ export const columns: ColumnDef<Project>[] = [
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const project = row.original;
+      const {
+        handleDelete,
+        openDialog,
+        setDialogType,
+        setCurrentProject
+      }= table.options.meta as {
+        handleDelete: ( id: number )=> void;
+        openDialog: ()=> void,
+        setDialogType: ( type: "Create"| "Edit" )=> void,
+        setCurrentProject: ( project: Project )=> void;
+      };
+
+      const [ isDialogOpen, setIsDialogOpen ]= useState<boolean>( false );
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={
-                () => navigator.clipboard.writeText( String( project.id ))
-              }
-            >
-              Copy project ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuItem>Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={ ()=> {
+                  setDialogType( "Edit" );
+                  setCurrentProject( project );
+                  openDialog();
+                }}
+              >
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-destructive"
+                onClick={ ()=> setIsDialogOpen( true )}
+              >
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <AlertDialog open={ isDialogOpen }>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This project will be permanently removed.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel
+                  onClick={ ()=> setIsDialogOpen( false )}
+                >
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={ ()=> {
+                    handleDelete( project.id );
+                    setIsDialogOpen( false );
+                  }}
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </>
       )
     },
   },
@@ -123,17 +179,72 @@ export const columns: ColumnDef<Project>[] = [
 
 export function ProjectsDataTable({ data }: { data: Project[] }) {
 
+  const [ rows, setRows ]= useState<Project[]>( ()=> data );
+
+  useEffect( ()=> {
+    if( data!== rows )
+      setRows( data );
+  }, [ data, rows ])
+
+  const handleDelete= async ( id: number )=> {
+    const prevRows= rows;
+
+    setRows( prev=> prev.filter( row=> row.id!== id ));
+
+    const res= await removeProjectAction( id );
+
+    if( res.success ) {
+      toast.success( res.message );
+    } else {
+      setRows( prevRows );
+      toast.error( res.message );
+    }
+  };
+
+  const [ dialogOpen, setDialogOpen ]= useState<boolean>( false );
+  const [ dialogType, setDialogType ]= useState<"Create"| "Edit">( "Create" );
+  const [ currentProject, setCurrentProject ]= useState<Project| undefined>();
+
+  const openDialog= useCallback( ()=> setDialogOpen( true ), [] );
+  const closeDialog= useCallback( ()=> setDialogOpen( false ), [] );
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel()
+    getFilteredRowModel: getFilteredRowModel(),
+    meta: {
+      handleDelete,
+      openDialog,
+      setDialogType,
+      setCurrentProject
+    }
   });
 
   return (
     <div className="w-full">
+      <header className="mb-4">
+        <Button
+          variant="secondary"
+          size="default"
+          onClick={ ()=> {
+            setCurrentProject( undefined )
+            setDialogType( "Create" )
+            openDialog();
+          }}
+        >
+          <IconPlus />
+          Create
+        </Button>
+        <ProjectDialog
+          type={ dialogType }
+          project={ currentProject }
+          isOpen={ dialogOpen }
+          close={ closeDialog }
+        />
+      </header>
       <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
