@@ -33,7 +33,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
-import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle
+} from "@/components/ui/empty";
+import { IconEdit, IconMistOff, IconPlus, IconTrash } from "@tabler/icons-react";
 import { Variable } from "@/services/project.service";
 import { VariablesDialog } from "@/components/projects/variables-dialog";
 import { removeVariableAction } from "@/app/dashboard/projects/[id]/actions";
@@ -192,83 +200,100 @@ export function VariablesDataTable({
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter keys..."
-          value={( table.getColumn( "key" )?.getFilterValue() as string )?? "" }
-          onChange={ event=>
-            table.getColumn( "key" )?.setFilterValue( event.target.value )
-          }
-          className="max-w-sm"
-        />
-        <Button
-          className="ml-2"
-          variant="secondary"
-          onClick={ ()=> {
-            setCurrentVariable( undefined );
-            setDialogType( "Add" );
-            openDialog();
-          }}
-        >
-          <IconPlus />
-        </Button>
-        <VariablesDialog
-          type={ dialogType }
-          variable={ currentVariable }
-          isOpen={ dialogOpen }
-          close={ closeDialog }
-        />
-      </div>
-      <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map( headerGroup=> (
-              <TableRow key={ headerGroup.id }>
-                {headerGroup.headers.map(header=> {
-                  return (
-                    <TableHead key={ header.id }>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
+      {!rows.length? (
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <IconMistOff />
+            </EmptyMedia>
+            <EmptyTitle>No variables</EmptyTitle>
+            <EmptyDescription>
+              You have no variables assigned to this project
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button
+              onClick={ ()=> {
+                setDialogType( "Add" );
+                openDialog();
+              }}
+            >
+              Add variable
+            </Button>
+          </EmptyContent>
+        </Empty>
+      ): (
+        <>
+          <div className="flex items-center py-4">
+            <Input
+              placeholder="Filter keys..."
+              value={( table.getColumn( "key" )?.getFilterValue() as string )?? "" }
+              onChange={ event=>
+                table.getColumn( "key" )?.setFilterValue( event.target.value )
+              }
+              className="max-w-sm"
+            />
+            <Button
+              className="ml-2"
+              variant="secondary"
+              onClick={ ()=> {
+                setCurrentVariable( undefined );
+                setDialogType( "Add" );
+                openDialog();
+              }}
+            >
+              <IconPlus />
+            </Button>
+          </div>
+          <div className="overflow-hidden rounded-md border">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map( headerGroup=> (
+                  <TableRow key={ headerGroup.id }>
+                    {headerGroup.headers.map(header=> {
+                      return (
+                        <TableHead key={ header.id }>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      )
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length? (
+                  table.getRowModel().rows.map( row=> (
+                    <TableRow
+                      key={ row.id }
+                      data-state={ row.getIsSelected()&& "selected" }
+                    >
+                      {row.getVisibleCells().map( cell=> (
+                        <TableCell key={ cell.id }>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
                           )}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length? (
-              table.getRowModel().rows.map( row=> (
-                <TableRow
-                  key={ row.id }
-                  data-state={ row.getIsSelected()&& "selected" }
-                >
-                  {row.getVisibleCells().map( cell=> (
-                    <TableCell key={ cell.id }>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={ columns.length }
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : null}
+              </TableBody>
+            </Table>
+          </div>
+        </>
+      )}
+      <VariablesDialog
+        type={ dialogType }
+        variable={ currentVariable }
+        isOpen={ dialogOpen }
+        close={ closeDialog }
+      />
     </div>
   )
 }
