@@ -1,5 +1,21 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
+import { Project } from "@/services/project.service";
+import { ProjectDialog } from "@/components/projects/project-dialog";
+import { removeProjectAction } from "@/app/dashboard/projects/actions";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import {
+  IconArchive,
+  IconCalendarTime,
+  IconCircleCheckFilled,
+  IconDots,
+  IconMistOff,
+  IconPlus
+} from "@tabler/icons-react";
 import {
   flexRender,
   getCoreRowModel,
@@ -9,16 +25,10 @@ import {
   useReactTable,
   type ColumnDef
 } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
-
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -29,17 +39,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Project } from "@/services/project.service";
-import { IconArchive, IconCalendarTime, IconCircleCheckFilled, IconMistOff, IconPlus, IconTrash } from "@tabler/icons-react";
-import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
-import { ProjectDialog } from "./project-dialog";
-import { removeProjectAction } from "@/app/dashboard/projects/actions";
-import { toast } from "sonner";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle
+} from "@/components/ui/empty";
 
-export const columns: ColumnDef<Project>[] = [
+export const columns: ColumnDef<Project>[]= [
   {
     accessorKey: "id",
     header: "ID",
@@ -54,41 +73,32 @@ export const columns: ColumnDef<Project>[] = [
     header: "Name",
     cell: ({ row }) => (
       <div>{ row.getValue( "name" )}</div>
-    ),
+    )
   },
   {
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => (
       <div>{ row.getValue( "description" )}</div>
-    ),
+    )
   },
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => (
-      <Badge variant="outline">
-        {
-          row.original.status=== "PLANNED"?
-            <><IconCalendarTime /> Planned</>:
-              row.original.status=== "ARCHIVED"?
-                <><IconArchive /> Archived</>:
-                <>
-                  <IconCircleCheckFilled
-                    className="fill-green-500 dark:fill-green-400"
-                  />
-                  Active
-                </>
-        }
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Created",
-    cell: ({ row }) => (
-      <div className="lowercase">{ row.getValue( "createdAt" )}</div>
-    )
+    cell: ({ row }) => {
+
+      const badgeData= {
+        PLANNED: { text: "Planned", icon: <IconCalendarTime /> },
+        ARCHIVED: { text: "Archived", icon: <IconArchive /> },
+        ACTIVE: { text: "Active", icon: <IconCircleCheckFilled /> }
+      }[ row.original.status ];
+
+      return (
+        <Badge variant="outline">
+          { badgeData.icon } { badgeData.text }
+        </Badge>
+      );
+    }
   },
   {
     id: "manage",
@@ -96,7 +106,9 @@ export const columns: ColumnDef<Project>[] = [
     cell: ({ row })=> {
       return (
         <Button variant="outline" size="sm" asChild>
-          <Link href={ `/dashboard/projects/${ row.original.id }` }>Manage</Link>
+          <Link href={ `/dashboard/projects/${ row.original.id }` }>
+            Manage
+          </Link>
         </Button>
       );
     }
@@ -126,7 +138,7 @@ export const columns: ColumnDef<Project>[] = [
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Open menu</span>
-                <MoreHorizontal />
+                <IconDots />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -174,9 +186,9 @@ export const columns: ColumnDef<Project>[] = [
           </AlertDialog>
         </>
       )
-    },
-  },
-]
+    }
+  }
+];
 
 export function ProjectsDataTable({ data }: { data: Project[] }) {
 
@@ -189,7 +201,6 @@ export function ProjectsDataTable({ data }: { data: Project[] }) {
 
   const handleDelete= async ( id: number )=> {
     const prevRows= rows;
-
     setRows( prev=> prev.filter( row=> row.id!== id ));
 
     const res= await removeProjectAction( id );
@@ -226,7 +237,7 @@ export function ProjectsDataTable({ data }: { data: Project[] }) {
 
   return (
     <div className="w-full">
-      {!rows.length? (
+      { !rows.length? (
         <Empty>
           <EmptyHeader>
             <EmptyMedia variant="icon">
@@ -234,7 +245,7 @@ export function ProjectsDataTable({ data }: { data: Project[] }) {
             </EmptyMedia>
             <EmptyTitle>No projects</EmptyTitle>
             <EmptyDescription>
-              There are no project. You can create one by clicking button down below.
+              There are no project. You can create a project by clicking button
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
@@ -269,28 +280,24 @@ export function ProjectsDataTable({ data }: { data: Project[] }) {
               <TableHeader>
                 { table.getHeaderGroups().map( headerGroup=> (
                   <TableRow key={ headerGroup.id }>
-                    { headerGroup.headers.map( header=> {
-                      return (
+                    { headerGroup.headers.map( header=> (
                         <TableHead key={ header.id }>
-                          {
-                            header.isPlaceholder ? null: flexRender(
+                          { header.isPlaceholder? null: flexRender(
                               header.column.columnDef.header,
                               header.getContext()
                             )
                           }
                         </TableHead>
                       )
-                    })}
+                    )}
                   </TableRow>
                 ))}
               </TableHeader>
               <TableBody>
-                {
-                  table.getRowModel().rows?.length? (
+                { table.getRowModel().rows?.length? (
                     table.getRowModel().rows.map( row=> (
                       <TableRow key={ row.id }>
-                        {
-                          row.getVisibleCells().map( cell=> (
+                        { row.getVisibleCells().map( cell=> (
                             <TableCell key={ cell.id }>
                               {
                                 flexRender(
@@ -299,8 +306,7 @@ export function ProjectsDataTable({ data }: { data: Project[] }) {
                                 )
                               }
                             </TableCell>
-                          ))
-                        }
+                        ))}
                       </TableRow>
                     ))
                   ): null
