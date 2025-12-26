@@ -1,12 +1,13 @@
 "use client";
 
 import { useActionState } from "react";
-import { useParams } from "next/navigation";
+import { toast } from "sonner";
+import { ActionResponse } from "@/app/interfaces";
+import { Project } from "@/services/project.service";
 import {
-  addVariableAction,
-  editVariableAction
-} from "@/app/dashboard/projects/[id]/actions";
-import { Button } from "@/components/ui/button";
+  createProjectAction,
+  editProjectAction
+} from "@/app/dashboard/projects/actions";
 import {
   Dialog,
   DialogClose,
@@ -18,11 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Project, Variable } from "@/services/project.service";
-import { toast } from "sonner";
-import { ActionResponse } from "@/app/interfaces";
-import { createProjectAction, editProjectAction } from "@/app/dashboard/projects/actions";
-
+import { Button } from "@/components/ui/button";
 
 export function ProjectDialog({
   type,

@@ -5,6 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VariablesDataTable } from "@/components/projects/variables-data-table";
 import { projectService } from "@/services/project.service";
 import { notFound } from "next/navigation";
+import { ProjectDialog } from "@/components/projects/project-dialog";
+import { ProjectHeader } from "@/components/projects/project-header";
 
 export default async function Page({
   params
@@ -24,22 +26,7 @@ export default async function Page({
 
   return (
     <main>
-      <Item>
-        <ItemContent>
-          <ItemTitle className="text-lg">{ project.name }</ItemTitle>
-          {
-            project.description?
-              <ItemDescription className="text-xs">
-                { project.description }
-              </ItemDescription>:
-              null
-          }
-        </ItemContent>
-        <ItemActions>
-          <Button variant="outline" size="sm">Edit</Button>
-          <Button variant="destructive" size="sm">Delete</Button>
-        </ItemActions>
-      </Item>
+      <ProjectHeader project={ project } />
       <Separator className="my-2" />
       <Tabs defaultValue="variables" className="m-4">
         <TabsList>
