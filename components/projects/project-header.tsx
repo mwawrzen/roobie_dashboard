@@ -15,6 +15,7 @@ import { removeProjectAction } from "@/app/dashboard/projects/actions";
 import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
 import { useRouter } from "next/navigation";
+import { IconArrowLeft } from "@tabler/icons-react";
 
 export function ProjectHeader({
   project
@@ -42,55 +43,60 @@ export function ProjectHeader({
   };
 
   return (
-    <Item>
-      <ItemContent>
-        <ItemTitle className="text-lg">{ project.name }</ItemTitle>
-        {
-          project.description?
-            <ItemDescription className="text-xs">
-              { project.description }
-            </ItemDescription>:
-            null
-        }
-      </ItemContent>
-      <ItemActions>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={ openDialog }
-        >
-          Edit
-        </Button>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="destructive" size="sm">
-              Delete
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This project will be permanently removed.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction onClick={ handleDelete }>
+    <>
+      <Button variant="ghost" size="sm" onClick={ router.back }>
+        <IconArrowLeft />
+        Back
+      </Button>
+      <Item>
+        <ItemContent>
+          <ItemTitle className="text-lg">{ project.name }</ItemTitle>
+          {
+            project.description&&
+              <ItemDescription className="text-xs">
+                { project.description }
+              </ItemDescription>
+          }
+        </ItemContent>
+        <ItemActions>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={ openDialog }
+          >
+            Edit
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="sm">
                 Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-        <ProjectDialog
-          type={ "Edit" }
-          project={ project }
-          isOpen={ isDialogOpen }
-          close={ closeDialog }
-        />
-      </ItemActions>
-    </Item>
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This project will be permanently removed.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction onClick={ handleDelete }>
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <ProjectDialog
+            type={ "Edit" }
+            project={ project }
+            isOpen={ isDialogOpen }
+            close={ closeDialog }
+          />
+        </ItemActions>
+      </Item>
+    </>
   );
 }
