@@ -20,6 +20,14 @@ export interface Variable {
 };
 
 export const projectService= {
+  create: async ( name: string, description: string ): Promise<Project>=> {
+    const res= await apiFetch( "/admin/project", {
+      method: "POST",
+      body: JSON.stringify({ name, description })
+    });
+
+    return res.json();
+  },
   getAll: async (): Promise<Project[]>=> {
     const res= await apiFetch( "/projects" );
     return res.json();
@@ -28,11 +36,15 @@ export const projectService= {
     const res= await apiFetch( `/project/${ id }` );
     return res.json();
   },
+  update: async ( id: number, name: string, description: string )=> {
+    return { id: 0 }; //! todo
+  },
   delete: async ( id: number )=> {
     const res= await apiFetch( `/project/${ id }`, {
-      method: "DELETE"
+      method: "DELETE",
+      next: { tags: [ `project-${ id }` ]}
     });
-    return res.json();
+    return res.text();
   },
   addVariable: async ( projectId: number, key: string, value: string )=> {
     const res= await apiFetch( `/project/${ projectId }/variable`, {
