@@ -2,7 +2,7 @@
 
 import { ActionResponse } from "@/app/interfaces";
 import { projectService } from "@/services/project.service";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function createProjectAction(
   formData: FormData
@@ -19,7 +19,7 @@ export async function createProjectAction(
     }
 
     const project= await projectService.create( name, description );
-    revalidateTag( `project-${ project.id }`, "max" );
+    revalidateTag( "projects", "max" );
 
     return {
       success: true,
@@ -52,12 +52,12 @@ export async function editProjectAction(
     revalidateTag( `project-${ project.id }`, "max" );
     return {
       success: true,
-      message: "Project successfully created"
+      message: "Project successfully updated"
     };
   } catch(_) {
     return {
       success: false,
-      message: "Error while creating a project"
+      message: "Error while updating a project"
     };
   }
 }
