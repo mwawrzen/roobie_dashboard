@@ -140,7 +140,7 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={ filteredNavMain } />
-        <NavSecondary items={ data.navSecondary } className="mt-auto" />
+        {/* <NavSecondary items={ data.navSecondary } className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={ user } />
