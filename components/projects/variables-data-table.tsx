@@ -1,6 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Variable } from "@/services/project.service";
+import { VariablesDialog } from "@/components/projects/variables-dialog";
+import { removeVariableAction } from "@/app/dashboard/projects/[id]/actions";
+import { toast } from "sonner";
+import {
+  IconEdit,
+  IconMistOff,
+  IconPlus,
+  IconTrash
+} from "@tabler/icons-react";
 import {
   flexRender,
   getCoreRowModel,
@@ -41,29 +51,24 @@ import {
   EmptyMedia,
   EmptyTitle
 } from "@/components/ui/empty";
-import { IconEdit, IconMistOff, IconPlus, IconTrash } from "@tabler/icons-react";
-import { Variable } from "@/services/project.service";
-import { VariablesDialog } from "@/components/projects/variables-dialog";
-import { removeVariableAction } from "@/app/dashboard/projects/[id]/actions";
-import { toast } from "sonner";
 
 export const columns: ColumnDef<Variable>[]= [
   {
     id: "select",
-    header: ({ table }) => (
+    header: ({ table })=> (
       <Checkbox
         checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
+          table.getIsAllPageRowsSelected()||
+          ( table.getIsSomePageRowsSelected()&& "indeterminate" )
         }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        onCheckedChange={ value=> table.toggleAllPageRowsSelected( !!value )}
         aria-label="Select all"
       />
     ),
-    cell: ({ row }) => (
+    cell: ({ row })=> (
       <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        checked={ row.getIsSelected() }
+        onCheckedChange={ value=> row.toggleSelected( !!value )}
         aria-label="Select row"
       />
     )
@@ -71,20 +76,20 @@ export const columns: ColumnDef<Variable>[]= [
   {
     accessorKey: "key",
     header: "Key",
-    cell: ({ row }) => (
+    cell: ({ row })=> (
       <div>{ row.getValue( "key" )}</div>
     )
   },
   {
     accessorKey: "value",
     header: "Value",
-    cell: ({ row }) => (
+    cell: ({ row })=> (
       <div>{ row.getValue( "value" )}</div>
     )
   },
   {
     id: "actions",
-    cell: ({ row, table }) => {
+    cell: ({ row, table })=> {
       const { key } = row.original;
       const {
         handleDelete,
@@ -155,7 +160,6 @@ export function VariablesDataTable({
 
   const handleDelete= async ( key: string )=> {
     const prevRows= rows;
-
     setRows( prev=> prev.filter( row=> row.key!== key ));
 
     const res= await removeVariableAction( projectId, key );
@@ -200,7 +204,7 @@ export function VariablesDataTable({
 
   return (
     <div className="w-full">
-      {!rows.length? (
+      { !rows.length? (
         <Empty>
           <EmptyHeader>
             <EmptyMedia variant="icon">
@@ -227,7 +231,10 @@ export function VariablesDataTable({
           <div className="flex items-center py-4">
             <Input
               placeholder="Filter keys..."
-              value={( table.getColumn( "key" )?.getFilterValue() as string )?? "" }
+              value={
+                ( table.getColumn( "key" )?.getFilterValue() as string )??
+                ""
+              }
               onChange={ event=>
                 table.getColumn( "key" )?.setFilterValue( event.target.value )
               }
@@ -248,17 +255,16 @@ export function VariablesDataTable({
           <div className="overflow-hidden rounded-md border">
             <Table>
               <TableHeader>
-                {table.getHeaderGroups().map( headerGroup=> (
+                { table.getHeaderGroups().map( headerGroup=> (
                   <TableRow key={ headerGroup.id }>
-                    {headerGroup.headers.map(header=> {
+                    { headerGroup.headers.map(header=> {
                       return (
                         <TableHead key={ header.id }>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
+                          { header.isPlaceholder? null: flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )
+                          }
                         </TableHead>
                       )
                     })}
@@ -266,23 +272,24 @@ export function VariablesDataTable({
                 ))}
               </TableHeader>
               <TableBody>
-                {table.getRowModel().rows?.length? (
-                  table.getRowModel().rows.map( row=> (
-                    <TableRow
-                      key={ row.id }
-                      data-state={ row.getIsSelected()&& "selected" }
-                    >
-                      {row.getVisibleCells().map( cell=> (
-                        <TableCell key={ cell.id }>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : null}
+                { table.getRowModel().rows?.length? (
+                    table.getRowModel().rows.map( row=> (
+                      <TableRow
+                        key={ row.id }
+                        data-state={ row.getIsSelected()&& "selected" }
+                      >
+                        { row.getVisibleCells().map( cell=> (
+                          <TableCell key={ cell.id }>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : null
+                }
               </TableBody>
             </Table>
           </div>
