@@ -7,6 +7,7 @@ import { projectService } from "@/services/project.service";
 import { notFound } from "next/navigation";
 import { ProjectDialog } from "@/components/projects/project-dialog";
 import { ProjectHeader } from "@/components/projects/project-header";
+import { UsersList } from "@/components/projects/users-list";
 
 export default async function Page({
   params
@@ -35,6 +36,9 @@ export default async function Page({
         </TabsList>
         <TabsContent value="variables">
           <VariablesDataTable projectId={ id } data={ variables } />
+        </TabsContent>
+        <TabsContent value="users">
+          <UsersList projectId={ project.id } />
         </TabsContent>
       </Tabs>
     </main>

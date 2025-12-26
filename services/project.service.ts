@@ -77,5 +77,16 @@ export const projectService= {
       next: { tags: [ `variables-${ projectId }` ]}
     });
     return res.json();
+  },
+  setProjectUser: async ( projectId: number, userId: number )=> {
+    const res= await apiFetch( `/admin/project/${ projectId }/users`, {
+      method: "PATCH",
+      body: JSON.stringify({ userId })
+    });
+    return res.text();
+  },
+  getProjectUsers: async ( projectId: number )=> {
+    const res= await apiFetch( `/admin/project/${ projectId }/users` );
+    return res.json();
   }
 };
