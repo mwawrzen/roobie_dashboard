@@ -15,8 +15,26 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
+import { removeProjectUserAction } from "@/app/dashboard/projects/[id]/actions";
+import { toast } from "sonner";
 
-export default function UserRow({ user }: { user: User }) {
+export default function UserRow({
+  user,
+  projectId
+}: {
+  user: User,
+  projectId: number
+}) {
+
+  const handleDelete= async ()=> {
+    const res= await removeProjectUserAction( user.id, projectId );
+
+    if( res.success )
+      toast.success( res.message );
+    else
+      toast.error( res.message );
+  }
+
   return (
     <TableRow>
       <TableCell>
@@ -43,7 +61,7 @@ export default function UserRow({ user }: { user: User }) {
               <AlertDialogCancel>
                 Cancel
               </AlertDialogCancel>
-              <AlertDialogAction onClick={ ()=> {}}>
+              <AlertDialogAction onClick={ handleDelete }>
                 Delete
               </AlertDialogAction>
             </AlertDialogFooter>
