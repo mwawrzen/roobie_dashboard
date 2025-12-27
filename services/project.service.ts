@@ -81,12 +81,23 @@ export const projectService= {
   setProjectUser: async ( projectId: number, userId: number )=> {
     const res= await apiFetch( `/admin/project/${ projectId }/users`, {
       method: "PATCH",
-      body: JSON.stringify({ userId })
+      body: JSON.stringify({ userId }),
+      next: { tags: [ `project-user-${ projectId }-${ userId }` ]}
     });
     return res.text();
   },
   getProjectUsers: async ( projectId: number )=> {
     const res= await apiFetch( `/admin/project/${ projectId }/users` );
     return res.json();
+  },
+  removeProjectUser: async ( userId: number, projectId: number )=> {
+    const res= await apiFetch(
+      `/admin/project/${ projectId }/users/${ userId }`,
+      {
+        method: "DELETE",
+        next: { tags: [ `project-user-${ projectId }-${ userId }` ]}
+      }
+    );
+    return res.text();
   }
 };
