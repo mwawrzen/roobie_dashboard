@@ -87,7 +87,7 @@ export async function setProjectUserAction(
 ): Promise< ActionResponse > {
   try {
     await projectService.setProjectUser( projectId, userId );
-    // revalidateTag( `variables-${ projectId }`, "max" );
+    revalidateTag( `project-user-${ projectId }-${ userId }`, "max" );
     return {
       success: true,
       message: "Project user successfully set"
@@ -96,6 +96,25 @@ export async function setProjectUserAction(
     return {
       success: false,
       message: "Error while setting project user"
+    };
+  }
+};
+
+export async function removeProjectUserAction(
+  userId: number,
+  projectId: number
+): Promise< ActionResponse > {
+  try {
+    await projectService.removeProjectUser( userId, projectId );
+    revalidateTag( `project-user-${ projectId }-${ userId }`, "max" );
+    return {
+      success: true,
+      message: "Project user successfully deleted"
+    };
+  } catch(_) {
+    return {
+      success: false,
+      message: "Error while deleting project user"
     };
   }
 };
