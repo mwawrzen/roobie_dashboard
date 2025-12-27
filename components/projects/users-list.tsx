@@ -15,7 +15,11 @@ export async function UsersList({ projectId }: { projectId: number }) {
   const projectUsers= await projectService.getProjectUsers( projectId );
 
   const userItems= projectUsers.map(( user: User )=> (
-    <UserRow key={ user.id } user={ user } />
+    <UserRow
+      key={ user.id }
+      user={ user }
+      projectId={ projectId }
+    />
   ));
 
   return (
