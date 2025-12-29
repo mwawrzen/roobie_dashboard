@@ -80,3 +80,41 @@ export async function editVariableAction(
     };
   }
 };
+
+export async function setProjectUserAction(
+  projectId: number,
+  userId: number
+): Promise< ActionResponse > {
+  try {
+    await projectService.setProjectUser( projectId, userId );
+    revalidateTag( `project-user-${ projectId }-${ userId }`, "max" );
+    return {
+      success: true,
+      message: "Project user successfully set"
+    };
+  } catch(_) {
+    return {
+      success: false,
+      message: "Error while setting project user"
+    };
+  }
+};
+
+export async function removeProjectUserAction(
+  userId: number,
+  projectId: number
+): Promise< ActionResponse > {
+  try {
+    await projectService.removeProjectUser( userId, projectId );
+    revalidateTag( `project-user-${ projectId }-${ userId }`, "max" );
+    return {
+      success: true,
+      message: "Project user successfully deleted"
+    };
+  } catch(_) {
+    return {
+      success: false,
+      message: "Error while deleting project user"
+    };
+  }
+};
