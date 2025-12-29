@@ -2,7 +2,7 @@
 
 import { ActionResponse } from "@/app/interfaces";
 import { projectService } from "@/services/project.service";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 
 export async function createProjectAction(
   formData: FormData
